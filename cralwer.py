@@ -87,7 +87,7 @@ class Youtube:
         stream = urllib2.urlopen(req)
         meta = stream.info()
         filesize = int(meta.getheaders('Content-Length')[0])
-        if verbose: print 'downaloading : %s (Size : %d Bytes)'%(filename, filesize)
+        if verbose: print 'downaloading : %s (Size : %s Bytes)'%(filename, '{:,.0f}'.format(float(filesize)))
 
         filesize_dl = 0
         block_size = 8192
@@ -98,12 +98,12 @@ class Youtube:
             filesize_dl += len(buffer)
             fp.write(buffer)
 
-            status = r'%10d  [%3.2f%%]' % (filesize_dl, filesize_dl * 100. / filesize)
+            status = r'%15s  [%3.2f%%]' % ('{:,.0f}'.format(filesize_dl), filesize_dl * 100. / filesize)
             status = status + chr(8)*(len(status)+1)
             if verbose: print status,
         
         fp.close()
-        if verbose: print 'downloaded  : %d Bytes'%filesize
+        if verbose: print 'downloaded  : %s Bytes'%'{:,.0f}'.format(filesize)
 
     def __get_video_info__(self):
         url = 'http://www.youtube.com/watch?v=' + self.video_id
