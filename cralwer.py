@@ -52,7 +52,7 @@ class Youtube:
                 '-i', filename+'.audio',
                 '-c:v', 'copy', '-c:a', 'aac', '-strict', 'experimental',
                 filename]
-        process = subprocess.Popen(' '.join(ffmpeg_command), shell=True, stdout=subprocess.PIPE)
+        process = subprocess.Popen(' '.join(ffmpeg_command), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         outs = process.communicate()
 
 
