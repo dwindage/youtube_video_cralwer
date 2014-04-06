@@ -10,8 +10,8 @@ import argparse
 
 class Youtube:
     def __init__(self, url):
-        self.url = url
         self.video_id = self.__parse_url__(url)
+        self.url = 'http://www.youtube.com/watch?v=' + self.video_id
         self.video_info_list = []
         self.audio_info_list = []
 
@@ -32,8 +32,8 @@ class Youtube:
         if verbose: print 'video download url : %s'%video_url
         if verbose: print 'audio download url : %s'%audio_url
 
-        youtube.__download__(video_url, filename+'.video', verbose)
-        youtube.__download__(audio_url, filename+'.audio', verbose)
+        youtube.__download__(video_url, self.url, filename+'.video', verbose)
+        youtube.__download__(audio_url, self.url, filename+'.audio', verbose)
         youtube.__merge__(filename, verbose)
 
         if verbose: print 'remove temporal file'
@@ -72,10 +72,13 @@ class Youtube:
                     return value
         return url
 
-    def __download__(self, url, filename='', verbose=False):
+    def __download__(self, url, referer='', filename='', verbose=False):
         req = urllib2.Request(url)
         req.add_header('User-Agent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/536.26.17 (KHTML, like Gecko) Version/6.0.2 Safari/536.26.17')
-        req.add_header('Referer', url)
+        if len(referer) > 0:
+            req.add_header('Referer', referer)
+        else:
+            req.add_header('Referer', url)
 
         # if filename is empty then return entire data
         if len(filename) == 0:
@@ -106,8 +109,7 @@ class Youtube:
         if verbose: print 'downloaded  : %s Bytes'%'{:,.0f}'.format(filesize)
 
     def __get_video_info__(self):
-        url = 'http://www.youtube.com/watch?v=' + self.video_id
-        html_data = self.__download__(url)
+        html_data = self.__download__(self.url)
 
         # parsing
         re_get_player_script = re.compile('<script>var ytplayer = ytplayer \|\| {};ytplayer\.config = ([^<]*);</script>')
@@ -122,6 +124,7 @@ class Youtube:
         try:
             ytplayer_config_dict = json.loads( player_scripts[0] )
             ytplayer_config_list = urllib.unquote(ytplayer_config_dict['args']['adaptive_fmts']).split(',')
+
             for items in ytplayer_config_list:
                 item_dict = {}
                 for item in items.split('&'):
