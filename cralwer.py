@@ -84,13 +84,13 @@ class Youtube:
         if len(filename) == 0:
             return urllib2.urlopen(req).read()
 
-        # save to file
-        fp = open(filename, 'wb')
-
         stream = urllib2.urlopen(req)
         meta = stream.info()
         filesize = int(meta.getheaders('Content-Length')[0])
         if verbose: print 'downaloading : %s (Size : %s Bytes)'%(filename, '{:,.0f}'.format(float(filesize)))
+        
+        # save to file
+        fp = open(filename, 'wb')
 
         filesize_dl = 0
         block_size = 8192
