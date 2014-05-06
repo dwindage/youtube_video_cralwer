@@ -17,23 +17,30 @@ class Youtube:
 
     def download(self, filename, verbose=False):
         if verbose: print 'video id : %s'%self.video_id
-        self.__get_video_info__()
+        if verbose: print '----------------------------------------------'
 
-        # TODO: will be optional selected by user interaction
+        self.__get_video_info__()
+        if verbose: print 'video bitrate lists :', [str(x['bitrate']) for x in self.video_info_list][:3]
+        if verbose: print 'video size lists :', [str(x['size']) for x in self.video_info_list][:3]
+        if verbose: print 'audio bitrate lists :', [str(x['bitrate']) for x in self.audio_info_list][:3]
         # select always best bitrate video at 0
         video_info = self.video_info_list[0]
         audio_info = self.audio_info_list[0]
-        if verbose: print 'video bitrate : %s'%video_info['bitrate']
-        if verbose: print 'video size : %s'%video_info['size']
-        if verbose: print 'audio bitrate : %s'%audio_info['bitrate']
+        if verbose: print 'selected video bitrate : %s'%video_info['bitrate']
+        if verbose: print 'selected video size : %s'%video_info['size']
+        if verbose: print 'selected audio bitrate : %s'%audio_info['bitrate']
+        if verbose: print '----------------------------------------------'
 
         video_url = self.__build_download_url__(video_info)
         audio_url = self.__build_download_url__(audio_info)
         if verbose: print 'video download url : %s'%video_url
         if verbose: print 'audio download url : %s'%audio_url
+        if verbose: print '----------------------------------------------'
 
         youtube.__download__(video_url, self.url, filename+'.video', verbose)
         youtube.__download__(audio_url, self.url, filename+'.audio', verbose)
+        if verbose: print '----------------------------------------------'
+
         youtube.__merge__(filename, verbose)
 
         if verbose: print 'remove temporal file'
@@ -114,7 +121,6 @@ class Youtube:
         # parsing
         re_get_player_script = re.compile('<script>var ytplayer = ytplayer \|\| {};ytplayer\.config = ([^(]*);\(function')
         player_scripts = re_get_player_script.findall(html_data)
-        print player_scripts
 
         if not len(player_scripts) == 1:
             print >> sys.stderr, 'not found play info'
