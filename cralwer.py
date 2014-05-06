@@ -112,8 +112,9 @@ class Youtube:
         html_data = self.__download__(self.url)
 
         # parsing
-        re_get_player_script = re.compile('<script>var ytplayer = ytplayer \|\| {};ytplayer\.config = ([^<]*);</script>')
+        re_get_player_script = re.compile('<script>var ytplayer = ytplayer \|\| {};ytplayer\.config = ([^(]*);\(function')
         player_scripts = re_get_player_script.findall(html_data)
+        print player_scripts
 
         if not len(player_scripts) == 1:
             print >> sys.stderr, 'not found play info'
