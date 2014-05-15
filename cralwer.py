@@ -119,7 +119,7 @@ class Youtube:
         html_data = self.__download__(self.url)
 
         # parsing
-        re_get_player_script = re.compile('<script>var ytplayer = ytplayer \|\| {};ytplayer\.config = ([^\']*);\(function')
+        re_get_player_script = re.compile('<script>var ytplayer = ytplayer \|\| {};ytplayer\.config = ([^*]*);\(function')
         player_scripts = re_get_player_script.findall(html_data)
 
         if not len(player_scripts) == 1:
