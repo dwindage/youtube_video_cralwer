@@ -28,6 +28,8 @@ class Youtube:
         audio_info = self.audio_info_list[0]
         if verbose: print 'selected video bitrate : %s'%video_info['bitrate']
         if verbose: print 'selected video size : %s'%video_info['size']
+        if verbose: print 'selected video mime : %s'%(video_info['mime'] if 'mime' in video_info else '')
+        if verbose: print 'selected video type : %s'%(video_info['type'] if 'type' in video_info else '')
         if verbose: print 'selected audio bitrate : %s'%audio_info['bitrate']
         if verbose: print '----------------------------------------------'
 
@@ -41,7 +43,8 @@ class Youtube:
         youtube.__download__(audio_url, self.url, filename+'.audio', verbose)
         if verbose: print '----------------------------------------------'
 
-        youtube.__merge__(filename, verbose)
+        video_format = 'h264' if video_info['type'] == 'video/webm;+codecs="vp9"' else 'copy'
+        youtube.__merge__(filename, video_format, verbose)
 
         if verbose: print 'remove temporal file'
         os.remove(filename+'.video')
@@ -49,7 +52,7 @@ class Youtube:
 
         if verbose: print 'done'
 
-    def __merge__(self, filename, verbose=False):
+    def __merge__(self, filename, video_format, verbose=False):
         if verbose: print 'merge %s and %s to %s'%(filename+'.video', filename+'.audio', filename)
 
         ffmpeg_command = ['ffmpeg',
@@ -57,8 +60,9 @@ class Youtube:
                 '-y',
                 '-i', filename+'.video',
                 '-i', filename+'.audio',
-                '-c:v', 'copy', '-c:a', 'aac', '-strict', 'experimental',
+                '-c:v', video_format, '-c:a', 'aac', '-strict', 'experimental',
                 filename]
+        if verbose: print ' '.join( ffmpeg_command )
         process = subprocess.Popen(' '.join(ffmpeg_command), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         outs = process.communicate()
 
